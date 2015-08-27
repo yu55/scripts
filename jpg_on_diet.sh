@@ -1,10 +1,10 @@
 #!/bin/bash
 
 # This script is basically taking all existing JPG files in given directory
-# and reducing their size without so much quality reduction.
+# and reducing their size on hard drive without so much quality reduction.
 # It's helpful when you want to send lots of photos via mail etc.
 #
-# This script requies imagemagick package installed.
+# This script requiers imagemagick package installed.
 #
 
 if [ $# -eq 0 ]; then

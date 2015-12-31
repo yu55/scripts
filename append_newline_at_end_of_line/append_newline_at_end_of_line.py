@@ -14,7 +14,6 @@ def step(ext, dirname, names):
             file = open(filePath, 'r+')
             readedLines = file.readlines()
             if os.stat(filePath).st_size > 0 and readedLines[-1][-1] != '\n':
-		print("Last=" + readedLines[-1])
                 file.write('\n')
                 print("File " + filePath + " appended")
             file.close()

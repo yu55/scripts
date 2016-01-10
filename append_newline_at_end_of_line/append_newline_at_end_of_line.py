@@ -1,6 +1,6 @@
 import os.path
  
-topdir = './test'
+topdir = 'test'
 exten = '.txt'
  
 def step(ext, dirname, names):
@@ -11,8 +11,9 @@ def step(ext, dirname, names):
             filePath = os.path.join(dirname, name)
             print(filePath)
 
-            file = open(filePath, 'a+')
-            if os.stat(filePath).st_size > 0 and file.readlines()[-1] != '\n':
+            file = open(filePath, 'r+')
+            readedLines = file.readlines()
+            if os.stat(filePath).st_size > 0 and readedLines[-1][-1] != '\n':
                 file.write('\n')
                 print("File " + filePath + " appended")
             file.close()

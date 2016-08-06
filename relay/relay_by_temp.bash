@@ -37,7 +37,7 @@ logger "T_ON=$T_ON, T_OFF=$T_OFF, T=$T, OLD_LEVEL=$OLD_LEVEL, LEVEL=$LEVEL";
 
 for i in 1 2 3
 do
-    sqlite3 /home/pi/auriol_pluviometer_reader/database.sl3 "INSERT INTO pin11 VALUES(datetime(CURRENT_TIMESTAMP, 'localtime'), '$LEVEL');";
+    sqlite3 /var/local/relay-by-temp-db.sl3 "INSERT INTO pin11 VALUES(datetime(CURRENT_TIMESTAMP, 'localtime'), '$LEVEL');";
     LAST_RESULT=$?;
     if [ $LAST_RESULT -ne 0 ]; then
         logger "Error while saving relay level to database: $LAST_RESULT";

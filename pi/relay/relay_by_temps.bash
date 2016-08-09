@@ -1,20 +1,26 @@
 #!/bin/bash
 
-LINE=`grep 25_temperature /proc/multi-am2301`;
 TempPin25='';
+LINE=`grep 25_temperature /proc/multi-am2301`;
 if [ $? -eq 0 ]; then
     COLS=( $LINE );
     TempPin25=${COLS[2]};
 fi
 
-LINE=`grep 25_timestamp /proc/multi-am2301`;
 TstmpPin25='';
+LINE=`grep 25_timestamp /proc/multi-am2301`;
 if [ $? -eq 0 ]; then
     COLS=( $LINE );
     TstmpPin25=${COLS[2]};
 fi
 
-# TODO: if older than 5 minutes TempPin25='';
+CURRENT_TIMESTAMP=`date +%s`;
+TempPin25Age=$((CURRENT_TIMESTAMP-TstmpPin25));
+#logger "$0: CURRENT_TIMESTAMP=$CURRENT_TIMESTAMP, TstmpPin25=$TstmpPin25, TempPin25Age=$TempPin25Age";
+if [ "$TempPin25Age" -gt 300 ]; then
+    TempPin25="";
+    logger "$0: TempPin25 too old - ignoring";
+fi
 
 TempAuriol=`sqlite3 /var/local/auriol-db.sl3 "SELECT amount FROM temperature WHERE created <= date('now','-5 minute') ORDER BY created DESC LIMIT 1;"`
 LAST_RESULT=$?;
@@ -23,7 +29,7 @@ if [ $LAST_RESULT -ne 0 ]; then
 fi
 
 if [ "$TempPin25" = "" ] && [ "$TempAuriol" = "" ]; then
-    echo "$0: Interrupting bacause of empty input temperatures: TempPin25=$TempPin25 and Tauriol=&Tauriol";
+    logger "$0: FATAL: Interrupting bacause of empty input temperatures: TempPin25=$TempPin25 and Tauriol=&Tauriol";
     exit;
 fi
 
@@ -48,6 +54,21 @@ if [ $? -ne 0 ]; then
 fi
 COLS=( $LINE );
 Tin=${COLS[2]};
+
+TinTstmp='';
+LINE=`grep 24_timestamp /proc/multi-am2301`;
+if [ $? -eq 0 ]; then
+    COLS=( $LINE );
+    TinTstmp=${COLS[2]};
+fi
+
+CURRENT_TIMESTAMP=`date +%s`;
+TinAge=$((CURRENT_TIMESTAMP-TinTstmp));
+#logger "$0: CURRENT_TIMESTAMP=$CURRENT_TIMESTAMP, TinTstmp=$TinTstmp, TinAge=$TinAge";
+if [ "$TinAge" -gt 300 ]; then
+    logger "$0: FATAL: Tin too old - exiting";
+    exit;
+fi
 
 LEVEL=`gpio -g read 9`;
 

@@ -74,18 +74,18 @@ LEVEL=`gpio -g read 9`;
 
 CMP_RESULT=`echo $Tin'>='$Tout+1 | bc -l`;
 
-if [ $CMP_RESULT -eq 1 ] && [[ "$LEVEL" == "0" ]]; then
+if [ $CMP_RESULT -eq 1 ] && [[ "$LEVEL" == "1" ]]; then
     gpio -g mode 9 out
-    gpio -g write 9 1
+    gpio -g write 9 0
 
     logger "$0: TempPin25=$TempPin25, TempAuriol=$TempAuriol, Tout=$Tout, Tin=$Tin, Set relay to ON";
 fi
 
 CMP_RESULT=`echo $Tin'<='$Tout | bc -l`;
 
-if [ $CMP_RESULT -eq 1 ] && [[ "$LEVEL" == "1" ]]; then
+if [ $CMP_RESULT -eq 1 ] && [[ "$LEVEL" == "0" ]]; then
     gpio -g mode 9 out
-    gpio -g write 9 0
+    gpio -g write 9 1
 
     logger "$0: TempPin25=$TempPin25, TempAuriol=$TempAuriol, Tout=$Tout, Tin=$Tin, Set relay to OFF";
 fi

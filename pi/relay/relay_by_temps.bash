@@ -22,7 +22,7 @@ if [ "$TempPin25Age" -gt 300 ]; then
     logger "$0: TempPin25 too old - ignoring";
 fi
 
-TempAuriol=`sqlite3 /var/local/auriol-db.sl3 "SELECT amount FROM temperature WHERE created >= datetime('now','localtime','-5 minute') ORDER BY created DESC LIMIT 1;"`;
+TempAuriol=`sqlite3 /var/local/auriol-db.sl3 "SELECT amount FROM temperature WHERE created >= datetime('now','localtime','-10 minute') ORDER BY created DESC LIMIT 1;"`;
 LAST_RESULT=$?;
 if [ $LAST_RESULT -ne 0 ]; then
     logger "$0: Error while reading TempAuriol from database: $LAST_RESULT";
@@ -67,6 +67,17 @@ TinAge=$((CURRENT_TIMESTAMP-TinTstmp));
 #logger "$0: CURRENT_TIMESTAMP=$CURRENT_TIMESTAMP, TinTstmp=$TinTstmp, TinAge=$TinAge";
 if [ "$TinAge" -gt 300 ]; then
     logger "$0: FATAL: Tin too old - exiting";
+    exit;
+fi
+
+CMP_RESULT=`echo $Tin'<='5 | bc -l`;
+
+if [ $CMP_RESULT -eq 1 ]; then
+    logger "$0: Tin < 5 C - shutting down and exiting";
+
+    gpio -g mode 9 out
+    gpio -g write 9 1
+
     exit;
 fi
 

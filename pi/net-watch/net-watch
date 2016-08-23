@@ -1,0 +1,30 @@
+#! /bin/sh
+
+### BEGIN INIT INFO
+# Provides:          pi_network_watchdog
+# Required-Start:    $remote_fs $syslog
+# Required-Stop:     $remote_fs $syslog
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+# Short-Description: Start pi_network_watchdog script
+# Description:       Starts pi_network_watchdog.bash script at boot 
+### END INIT INFO
+
+case "$1" in
+  start)
+    echo "Starting pi_network_watchdog"
+    screen -d -m -S "pi_network_watchdog" /usr/local/bin/pi_network_watchdog.bash
+    ;;
+  stop)
+    echo "Stopping pi_network_watchdog"
+    screen -X -S "pi_network_watchdog" kill
+    ;;
+  *)
+    echo "Usage: /etc/init.d/net-watch {start|stop}"
+    exit 1
+    ;;
+esac
+
+exit 0 
+
+

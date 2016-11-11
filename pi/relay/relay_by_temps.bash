@@ -22,11 +22,19 @@ if [ "$TempPin25Age" -gt 300 ]; then
     logger "$0: TempPin25 too old - ignoring";
 fi
 
-TempAuriol=`sqlite3 /var/local/am2301-db.sl3 "SELECT temperature FROM pin7 WHERE created >= datetime('now','localtime','-10 minute') ORDER BY created DESC LIMIT 1;"`;
-LAST_RESULT=$?;
-if [ $LAST_RESULT -ne 0 ]; then
-    logger "$0: Error while reading TempAuriol from database: $LAST_RESULT";
-fi
+TempAuriol='';
+for i in 1 2 3
+do
+    TempAuriol=`sqlite3 /var/local/am2301-db.sl3 "SELECT temperature FROM pin7 WHERE created >= datetime('now','localtime','-10 minute') ORDER BY created DESC LIMIT 1;"`;
+    LAST_RESULT=$?;
+
+    if [ $LAST_RESULT -ne 0 ]; then
+        logger "$0: Error while reading TempAuriol from database: $LAST_RESULT";
+        sleep 2;
+    else
+        break;
+    fi
+done
 
 if [ "$TempPin25" = "" ] && [ "$TempAuriol" = "" ]; then
     logger "$0: FATAL: Interrupting bacause of empty input temperatures: TempPin25=$TempPin25 and Tauriol=&Tauriol";

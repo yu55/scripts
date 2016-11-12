@@ -91,22 +91,45 @@ fi
 
 LEVEL=`gpio -g read 9`;
 
+LEVEL_TO_BE_SET=''
 CMP_RESULT=`echo $Tin'>='$Tout+2 | bc -l`;
 
 if [ $CMP_RESULT -eq 1 ] && [[ "$LEVEL" == "1" ]]; then
-    gpio -g mode 9 out
-    gpio -g write 9 0
-
-    logger "$0: TempPin25=$TempPin25, TempAuriol=$TempAuriol, Tout=$Tout, Tin=$Tin, Set relay to ON";
+    LEVEL_TO_BE_SET='0'
+    logger "$0: TempPin25=$TempPin25, TempAuriol=$TempAuriol, Tout=$Tout, Tin=$Tin, relay ON(0) conditions";
 fi
 
 CMP_RESULT=`echo $Tin'<='$Tout+1 | bc -l`;
 
 if [ $CMP_RESULT -eq 1 ] && [[ "$LEVEL" == "0" ]]; then
-    gpio -g mode 9 out
-    gpio -g write 9 1
+    LEVEL_TO_BE_SET='1'
+    logger "$0: TempPin25=$TempPin25, TempAuriol=$TempAuriol, Tout=$Tout, Tin=$Tin, relay OFF(1) conditions";
+fi
 
-    logger "$0: TempPin25=$TempPin25, TempAuriol=$TempAuriol, Tout=$Tout, Tin=$Tin, Set relay to OFF";
+FanDuration='';
+for i in 1 2 3
+do
+    FanDuration=`sqlite3 /var/local/relay-by-temp-db.sl3 "SELECT count(*) FROM pin9 WHERE created >= datetime('now', 'start of day') AND level = 0;"`;
+    LAST_RESULT=$?;
+
+    if [ $LAST_RESULT -ne 0 ]; then
+        logger "$0: Error while reading FanDuration from database: $LAST_RESULT";
+        sleep 2;
+    else
+        break;
+    fi
+done
+
+DUR_CMP_RESULT=`echo $FanDuration'>='720 | bc -l`;
+if [ $DUR_CMP_RESULT -eq 1 ]; then
+    logger "$0: FanDuration timeout. Relay OFF(1) condition"
+    LEVEL_TO_BE_SET='1'
+fi
+
+if [ "$LEVEL_TO_BE_SET" != "" ]; then
+    gpio -g mode 9 out
+    gpio -g write 9 $LEVEL_TO_BE_SET
+    logger "$0: Setting relay to LEVEL_TO_BE_SET=$LEVEL_TO_BE_SET";
 fi
 
 OLD_LEVEL=$LEVEL

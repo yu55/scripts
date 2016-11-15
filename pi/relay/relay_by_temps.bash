@@ -120,7 +120,7 @@ do
     fi
 done
 
-DUR_CMP_RESULT=`echo $FanDuration'>='720 | bc -l`;
+DUR_CMP_RESULT=`echo $FanDuration'>='360 | bc -l`;
 if [ $DUR_CMP_RESULT -eq 1 ]; then
     logger "$0: FanDuration timeout. Relay OFF(1) condition"
     LEVEL_TO_BE_SET='1'

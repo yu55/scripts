@@ -109,7 +109,7 @@ fi
 FanDuration='';
 for i in 1 2 3
 do
-    FanDuration=`sqlite3 /var/local/relay-by-temp-db.sl3 "SELECT count(*) FROM pin9 WHERE created >= datetime('now', 'start of day') AND level = 0;"`;
+    FanDuration=`sqlite3 /var/local/relay-by-temp-db.sl3 "SELECT count(*) FROM pin9 WHERE created >= datetime('now', 'localtime', 'start of day') AND level = 0;"`;
     LAST_RESULT=$?;
 
     if [ $LAST_RESULT -ne 0 ]; then

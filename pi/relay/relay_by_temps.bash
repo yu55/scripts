@@ -93,8 +93,9 @@ LEVEL=`gpio -g read 9`;
 
 LEVEL_TO_BE_SET=''
 CMP_RESULT=`echo $Tin'>='$Tout+2 | bc -l`;
+CMP_RESULT2=`echo $Tin'>='6 | bc -l`;
 
-if [ $CMP_RESULT -eq 1 ] && [[ "$LEVEL" == "1" ]]; then
+if [ $CMP_RESULT -eq 1 ] && [ $CMP_RESULT2 -eq 1 ] && [[ "$LEVEL" == "1" ]]; then
     LEVEL_TO_BE_SET='0'
     logger "$0: TempPin25=$TempPin25, TempAuriol=$TempAuriol, Tout=$Tout, Tin=$Tin, relay ON(0) conditions";
 fi

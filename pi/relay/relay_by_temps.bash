@@ -79,6 +79,19 @@ if [ "$TinAge" -gt 300 ]; then
     gpio -g mode 9 out
     gpio -g write 9 1
 
+    LEVEL=`gpio -g read 9`;
+    for i in 1 2 3
+    do
+        sqlite3 /var/local/relay-by-temp-db.sl3 "INSERT INTO pin9 VALUES(datetime(CURRENT_TIMESTAMP, 'localtime'), '$LEVEL');";
+        LAST_RESULT=$?;
+        if [ $LAST_RESULT -ne 0 ]; then
+            logger "$0: Error while saving relay level to database: $LAST_RESULT";
+            sleep 2;
+        else
+            break;
+        fi
+    done
+
     exit;
 fi
 
@@ -89,6 +102,19 @@ if [ $CMP_RESULT -eq 1 ]; then
 
     gpio -g mode 9 out
     gpio -g write 9 1
+
+    LEVEL=`gpio -g read 9`;
+    for i in 1 2 3
+    do
+        sqlite3 /var/local/relay-by-temp-db.sl3 "INSERT INTO pin9 VALUES(datetime(CURRENT_TIMESTAMP, 'localtime'), '$LEVEL');";
+        LAST_RESULT=$?;
+        if [ $LAST_RESULT -ne 0 ]; then
+            logger "$0: Error while saving relay level to database: $LAST_RESULT";
+            sleep 2;
+        else
+            break;
+        fi
+    done
 
     exit;
 fi

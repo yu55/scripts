@@ -1,7 +1,7 @@
 #!/bin/bash
 
 TempPin25='';
-LINE=`grep 25_temperature /proc/multi-am2301`;
+LINE=`grep 25_temp_1m /proc/multi-am2301`;
 if [ $? -eq 0 ]; then
     COLS=( $LINE );
     TempPin25=${COLS[2]};
@@ -55,9 +55,9 @@ else
     fi
 fi
 
-LINE=`grep 24_temperature /proc/multi-am2301`;
+LINE=`grep 24_temp_1m /proc/multi-am2301`;
 if [ $? -ne 0 ]; then
-    echo "$0: Problem with grep 24_temperature";
+    echo "$0: Problem with grep 24_temp_1m";
     exit $?;
 fi
 COLS=( $LINE );
@@ -74,14 +74,18 @@ CURRENT_TIMESTAMP=`date +%s`;
 TinAge=$((CURRENT_TIMESTAMP-TinTstmp));
 #logger "$0: CURRENT_TIMESTAMP=$CURRENT_TIMESTAMP, TinTstmp=$TinTstmp, TinAge=$TinAge";
 if [ "$TinAge" -gt 300 ]; then
-    logger "$0: FATAL: Tin too old - exiting";
+    logger "$0: FATAL: Tin too old, relay OFF(1) conditions, exiting";
+
+    gpio -g mode 9 out
+    gpio -g write 9 1
+
     exit;
 fi
 
 CMP_RESULT=`echo $Tin'<='5 | bc -l`;
 
 if [ $CMP_RESULT -eq 1 ]; then
-    logger "$0: Tin < 5 C - shutting down and exiting";
+    logger "$0: Tin < 5 C, relay OFF(1) conditions, shutting down and exiting";
 
     gpio -g mode 9 out
     gpio -g write 9 1

@@ -21,7 +21,7 @@ fi
 LEVEL=`gpio -g read 9`;
 
 gpio -g mode 9 out
-gpio -g write 9 0
+gpio -g write 9 1
 
 logger "Set relay 9 to OFF at boot";
 

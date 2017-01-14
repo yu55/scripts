@@ -1,6 +1,6 @@
 #!/bin/bash
 
-LINE=`grep 25_temperature /proc/multi-am2301`;
+LINE=`grep 25_temp_1m /proc/multi-am2301`;
 if [ $? -ne 0 ]; then
     echo "Problem with grep Temperature";
     exit $?;
